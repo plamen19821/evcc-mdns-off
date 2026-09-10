@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
     inputs:
       evcc_version:
@@ -19,7 +18,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       packages: write
@@ -35,7 +33,7 @@ jobs:
           if [ -n "${{ inputs.evcc_version }}" ]; then
             VERSION="${{ inputs.evcc_version }}"
           else
-            VERSION="$(sed '1s/^\xEF\xBB\xBF//' EVCC_VERSION | tr -d '\r\n')"
+            VERSION="0.315.0"
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Building EVCC $VERSION"
@@ -60,4 +58,3 @@ jobs:
             ghcr.io/${{ env.IMAGE_NAME }}:latest
           labels: |
             org.opencontainers.image.source=https://github.com/plamen19821/evcc-mdns-off
-

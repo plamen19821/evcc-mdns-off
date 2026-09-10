@@ -1,7 +1,7 @@
 ---
-name: evcc mDNS OFF
+name: evcc
 version: 0.315.0
-slug: evcc-mdns-off
+slug: evcc
 description: EV Charge Controller!
 url: https://github.com/evcc-io/evcc
 stage: stable
@@ -54,7 +54,7 @@ ports_description:
   8899/udp: "Modbus UDP"
   9522/udp: "SMA Speedwire Multicast"
 
-image: ghcr.io/plamen19821/evcc-mdns-off
+image: evcc/evcc
 
 options: 
   sqlite_file: /data/evcc.db
