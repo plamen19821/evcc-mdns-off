@@ -1,4 +1,4 @@
-﻿name: EVCC mDNS OFF
+name: EVCC mDNS OFF
 version: "0.315.0"
 slug: evcc-mdns-off
 description: EVCC with mDNS registration disabled.
@@ -16,20 +16,15 @@ webui: "http://[HOST]:[PORT:7070]"
 ports:
   7070/tcp: 7070
   4712/tcp: 4712
-  8887/tcp: 8887
 ports_description:
   7070/tcp: "EVCC Web UI / API"
   4712/tcp: "EEBus"
-  8887/tcp: "OCPP 1.6J"
 map:
-  - type: addon_config
+  - type: app_config
     read_only: false
   - type: data
     read_only: false
 options: {}
 schema: {}
 image: "ghcr.io/plamen19821/evcc-mdns-off"
-
-
-
 
