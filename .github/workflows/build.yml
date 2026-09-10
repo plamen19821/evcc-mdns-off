@@ -1,6 +1,10 @@
 ﻿name: Build EVCC mDNS OFF
 
 on:
+  push:
+    branches:
+      - main
+
   workflow_dispatch:
     inputs:
       evcc_version:
@@ -24,6 +28,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Determine EVCC version
+        id: version
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.evcc_version }}" ]; then
+            VERSION="${{ inputs.evcc_version }}"
+          else
+            VERSION="$(tr -d '\r\n' < EVCC_VERSION)"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Building EVCC $VERSION"
+
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -38,9 +54,9 @@ jobs:
           file: ./evcc-mdns-off/Dockerfile
           push: true
           build-args: |
-            EVCC_VERSION=${{ inputs.evcc_version }}
+            EVCC_VERSION=${{ steps.version.outputs.version }}
           tags: |
-            ghcr.io/${{ env.IMAGE_NAME }}:${{ inputs.evcc_version }}
+            ghcr.io/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
             ghcr.io/${{ env.IMAGE_NAME }}:latest
           labels: |
             org.opencontainers.image.source=https://github.com/plamen19821/evcc-mdns-off
