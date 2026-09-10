@@ -1,7 +1,7 @@
 ---
-name: evcc
+name: evcc mDNS OFF
 version: 0.315.0
-slug: evcc
+slug: evcc-mdns-off
 description: EV Charge Controller!
 url: https://github.com/evcc-io/evcc
 stage: stable
@@ -26,7 +26,7 @@ arch:
   - aarch64
   - amd64
 
-map: 
+map:
   - type: addon_config
     read_only: False
   - type: homeassistant_config
@@ -42,7 +42,7 @@ ports:
   8887/tcp: 8887
   8899/udp: 8899
   9522/udp: 9522
-  
+
 ports_description:
   4712/tcp: "EEBUS"
   5200/tcp: "Modbus Proxy"
@@ -54,9 +54,9 @@ ports_description:
   8899/udp: "Modbus UDP"
   9522/udp: "SMA Speedwire Multicast"
 
-image: evcc/evcc
+image: ghcr.io/plamen19821/evcc-mdns-off
 
-options: 
+options:
   sqlite_file: /data/evcc.db
   config_file: /config/evcc.yaml
 
