@@ -1,0 +1,46 @@
+﻿name: Build EVCC mDNS OFF
+
+on:
+  workflow_dispatch:
+    inputs:
+      evcc_version:
+        description: "EVCC Version"
+        required: true
+        default: "0.315.0"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: plamen19821/evcc-mdns-off
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./evcc-mdns-off
+          file: ./evcc-mdns-off/Dockerfile
+          push: true
+          build-args: |
+            EVCC_VERSION=${{ inputs.evcc_version }}
+          tags: |
+            ghcr.io/${{ env.IMAGE_NAME }}:${{ inputs.evcc_version }}
+            ghcr.io/${{ env.IMAGE_NAME }}:latest
+          labels: |
+            org.opencontainers.image.source=https://github.com/plamen19821/evcc-mdns-off

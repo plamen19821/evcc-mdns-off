@@ -1,0 +1,29 @@
+﻿name: EVCC mDNS OFF
+version: "0.315.0-1"
+slug: evcc-mdns-off
+description: EVCC with mDNS registration disabled.
+url: https://github.com/evcc-io/evcc
+arch:
+  - amd64
+init: false
+startup: application
+boot: auto
+host_network: true
+hassio_api: true
+homeassistant_api: true
+watchdog: "http://[HOST]:7070"
+webui: "http://[HOST]:7070"
+ports:
+  7070/tcp: 7070
+  4712/tcp: 4712
+ports_description:
+  7070/tcp: "EVCC Web UI / API"
+  4712/tcp: "EEBus"
+map:
+  - type: addon_config
+    read_only: false
+  - type: data
+    read_only: false
+options: {}
+schema: {}
+image: "ghcr.io/plamen19821/evcc-mdns-off"
