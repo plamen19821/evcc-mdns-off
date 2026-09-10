@@ -1,4 +1,4 @@
-﻿name: EVCC mDNS OFF
+name: EVCC mDNS OFF
 version: "0.315.0"
 slug: evcc-mdns-off
 description: EVCC with mDNS registration disabled.
