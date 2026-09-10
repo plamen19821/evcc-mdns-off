@@ -35,7 +35,7 @@ jobs:
           if [ -n "${{ inputs.evcc_version }}" ]; then
             VERSION="${{ inputs.evcc_version }}"
           else
-            VERSION="$(tr -d '\r\n' < EVCC_VERSION)"
+            VERSION="$(sed '1s/^\xEF\xBB\xBF//' EVCC_VERSION | tr -d '\r\n')"
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Building EVCC $VERSION"
@@ -60,3 +60,4 @@ jobs:
             ghcr.io/${{ env.IMAGE_NAME }}:latest
           labels: |
             org.opencontainers.image.source=https://github.com/plamen19821/evcc-mdns-off
+

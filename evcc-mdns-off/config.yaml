@@ -1,5 +1,5 @@
 ﻿name: EVCC mDNS OFF
-version: "0.315.0-1"
+version: "0.315.0"
 slug: evcc-mdns-off
 description: EVCC with mDNS registration disabled.
 url: https://github.com/evcc-io/evcc
@@ -27,3 +27,4 @@ map:
 options: {}
 schema: {}
 image: "ghcr.io/plamen19821/evcc-mdns-off"
+
