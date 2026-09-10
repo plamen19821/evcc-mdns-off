@@ -27,26 +27,11 @@ ENV GOMODCACHE=/root/.cache/go-mod
 
 COPY --from=node /build /build
 
-# mDNS vollständig deaktivieren:
-# Die originale configureMDNS()-Funktion wird durch eine leere Funktion ersetzt.
-RUN awk '
-/^func configureMDNS\(/ {
-    print "func configureMDNS(conf globalconfig.Network) error {"
-    print "\treturn nil"
-    print "}"
-    in_mdns=1
-    next
-}
-in_mdns && /^func / {
-    in_mdns=0
-}
-!in_mdns {
-    print
-}
-' cmd/setup.go > cmd/setup.go.new \
- && mv cmd/setup.go.new cmd/setup.go \
- && sed -i '/github.com\/libp2p\/zeroconf\/v2/d' cmd/setup.go \
- && ! grep -q 'zeroconf.RegisterProxy' cmd/setup.go
+# mDNS vollständig deaktivieren
+RUN awk '/^func configureMDNS\(/ {print "func configureMDNS(conf globalconfig.Network) error {"; print "\treturn nil"; print "}"; in_mdns=1; next} in_mdns && /^func / {in_mdns=0} !in_mdns {print}' cmd/setup.go > cmd/setup.go.new \
+    && mv cmd/setup.go.new cmd/setup.go \
+    && sed -i '/github.com\/libp2p\/zeroconf\/v2/d' cmd/setup.go \
+    && ! grep -q 'zeroconf.RegisterProxy' cmd/setup.go
 
 RUN go mod download
 RUN make install
