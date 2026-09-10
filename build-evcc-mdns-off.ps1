@@ -1,70 +1,43 @@
-param(
-    [Parameter(Mandatory=$true)]
-    [string]$Version
-)
-
 $ErrorActionPreference = "Stop"
 
-$Repo = "C:\Users\Pako\Desktop\evcc\evcc-mdns-off-github"
+$RepoPath = "C:\Users\Pako\Desktop\evcc\evcc-mdns-off-github"
 
-Set-Location $Repo
+Set-Location $RepoPath
 
 Write-Host ""
-Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host " EVCC mDNS OFF - Release Builder" -ForegroundColor Cyan
-Write-Host " EVCC Version: $Version" -ForegroundColor Cyan
-Write-Host "==========================================" -ForegroundColor Cyan
+Write-Host "=== EVCC mDNS OFF - GitHub Build anstoßen ===" -ForegroundColor Cyan
 Write-Host ""
 
-$Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+git status --short
 
-# EVCC_VERSION ohne BOM schreiben
-[System.IO.File]::WriteAllText(
-    "$Repo\EVCC_VERSION",
-    $Version,
-    $Utf8NoBom
-)
+$changes = git status --porcelain
 
-# HA config.yaml aktualisieren
-$ConfigFile = "$Repo\evcc-mdns-off\config.yaml"
-
-$Config = [System.IO.File]::ReadAllText($ConfigFile)
-
-# Version
-$Config = $Config -replace 'version:\s*"[^"]+"', "version: `"$Version`""
-
-# Aktuelle HA-Syntax
-$Config = $Config -replace 'type:\s*addon_config', 'type: app_config'
-
-# WebUI-Port
-$Config = $Config -replace 'webui:\s*"http://\[HOST\]:7070"', 'webui: "http://[HOST]:[PORT:7070]"'
-
-[System.IO.File]::WriteAllText(
-    $ConfigFile,
-    $Config,
-    $Utf8NoBom
-)
-
-Write-Host "Version und HA-Konfiguration aktualisiert." -ForegroundColor Green
-Write-Host ""
-
-# Git
-git add EVCC_VERSION .\evcc-mdns-off\config.yaml
-
-if (git diff --cached --quiet) {
-    Write-Host "Keine Änderungen vorhanden." -ForegroundColor Yellow
-}
-else {
-    git commit -m "Build EVCC $Version"
-    git push
+if (-not $changes) {
+    Write-Host ""
+    Write-Host "Keine Änderungen vorhanden. Kein Push erforderlich." -ForegroundColor Yellow
+    Write-Host ""
+    Read-Host "Enter zum Beenden"
+    exit
 }
 
 Write-Host ""
-Write-Host "==========================================" -ForegroundColor Green
-Write-Host " FERTIG - GitHub Build ausgelöst" -ForegroundColor Green
-Write-Host "==========================================" -ForegroundColor Green
+Write-Host "Änderungen werden committed..." -ForegroundColor Cyan
+
+git add .
+
+$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm"
+git commit -m "Update EVCC mDNS OFF - $timestamp"
+
 Write-Host ""
-Write-Host "EVCC Version: $Version"
-Write-Host "GitHub Actions:"
-Write-Host "https://github.com/plamen19821/evcc-mdns-off/actions"
+Write-Host "Push zu GitHub..." -ForegroundColor Cyan
+
+git push origin main
+
 Write-Host ""
+Write-Host "========================================" -ForegroundColor Green
+Write-Host "Push erfolgreich." -ForegroundColor Green
+Write-Host "GitHub Actions startet jetzt den Build." -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Green
+Write-Host ""
+
+Read-Host "Enter zum Beenden"
