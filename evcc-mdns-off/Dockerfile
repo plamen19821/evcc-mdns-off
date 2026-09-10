@@ -1,16 +1,17 @@
-﻿FROM --platform=$BUILDPLATFORM node:26-alpine AS source
+﻿FROM --platform=$BUILDPLATFORM node:26-alpine AS node
 
-RUN apk update && apk add --no-cache git make curl bash patch \
+RUN apk update && apk add --no-cache git make curl bash \
     && curl -fsSL https://vite.plus | bash
 
 ENV PATH="/root/.vite-plus/bin:/root/.local/share/vite-plus/bin:${PATH}"
 
 ARG EVCC_VERSION=0.315.0
 
-WORKDIR /src
+WORKDIR /build
 
 RUN git clone --depth 1 --branch "${EVCC_VERSION}" https://github.com/evcc-io/evcc.git .
 
+RUN npm ci
 RUN make ui
 
 
@@ -24,8 +25,7 @@ WORKDIR /build
 ENV GOCACHE=/root/.cache/go-build
 ENV GOMODCACHE=/root/.cache/go-mod
 
-COPY --from=source /src /build
-COPY --from=source /src/dist /build/dist
+COPY --from=node /build /build
 
 RUN sed -i '/github.com\/libp2p\/zeroconf\/v2/d' cmd/setup.go \
  && sed -i '/func configureMDNS/,/^}/c\
@@ -37,14 +37,22 @@ RUN go mod download
 RUN make install
 RUN make patch-asn1
 RUN make assets
-RUN make build
+
+COPY --from=node /build/dist /build/dist
+
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
+ARG GOARM=${TARGETVARIANT#v}
+
+RUN RELEASE=1 GOOS=${TARGETOS} GOARCH=${TARGETARCH} GOARM=${GOARM} make build
 
 
 FROM alpine:3.23
 
-RUN apk add --no-cache ca-certificates tzdata
-
 WORKDIR /app
+
+ENV TZ=Europe/Berlin
 
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
